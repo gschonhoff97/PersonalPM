@@ -103,6 +103,22 @@ public class Main extends Application {
         passwordField.setPrefHeight(40);
         gridPane.add(passwordField, 1, 3);
 
+
+        // Add Submit Button
+        Button profileButton = new Button("New Profile");
+        profileButton.setPrefHeight(40);
+        profileButton.setDefaultButton(true);
+        profileButton.setPrefWidth(120);
+        gridPane.add(profileButton, 0, 5, 2, 1);
+        GridPane.setHalignment(profileButton, HPos.CENTER);
+        GridPane.setMargin(profileButton, new Insets(6, 0,20,0));
+        profileButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+
+            }
+        });
+
         // Add Submit Button
         Button submitButton = new Button("Login");
         submitButton.setPrefHeight(40);
