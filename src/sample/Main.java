@@ -12,6 +12,7 @@ import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.stage.StageStyle;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
@@ -20,12 +21,18 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import java.lang.String;
 import java.io.File;
+import javafx.scene.image.Image;
 
 public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("Personal Password Manager");
+        primaryStage.initStyle(StageStyle.DECORATED);
+        Image i = new Image(getClass().getResourceAsStream("images/lock.png"));
+        primaryStage.getIcons().add(i);
+       // primaryStage.getIcons().clear();
+        //primaryStage.getIcons().add("file:///" + i.getAbsolutePath().replace("\\", "/"));
         // Create the registration form grid pane
         GridPane gridPane = createRegistrationFormPane();
         // Add UI controls to the registration form grid pane
