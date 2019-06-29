@@ -22,6 +22,12 @@ import javafx.stage.Window;
 import java.lang.String;
 import java.io.File;
 import javafx.scene.image.Image;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.lang.*;
 
 public class Main extends Application {
 
@@ -85,7 +91,7 @@ public class Main extends Application {
 
     private void addUIControls(GridPane gridPane) {
         // Add Header
-        Label headerLabel = new Label("Protect your passwords people!");
+        Label headerLabel = new Label("Protect your passwords, people!");
         headerLabel.setFont(Font.font("Arial", FontWeight.BOLD, 24));
         gridPane.add(headerLabel, 0,0,2,1);
         GridPane.setHalignment(headerLabel, HPos.CENTER);
@@ -162,6 +168,26 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
+
+        System.out.println("TEST");
+        // Create a variable for the connection string.
+       // Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        String connectionUrl = "jdbc:mysql://localhost:3306/new_schema?user=root&password=fireflea431!";
+
+        try (Connection con = DriverManager.getConnection(connectionUrl); Statement stmt = con.createStatement();) {
+            System.out.println("TEST");
+            String SQL = "SELECT * FROM testtab1";
+            ResultSet rs = stmt.executeQuery(SQL);
+
+            // Iterate through the data in the result set and display it.
+            while (rs.next()) {
+                System.out.println(rs.getString("FirstName") + " " + rs.getString("LastName"));
+            }
+        }
+        // Handle any errors that may have occurred.
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
         launch(args);
     }
 }
