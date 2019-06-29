@@ -141,12 +141,28 @@ public class Main extends Application {
         GridPane.setHalignment(submitButton, HPos.CENTER);
         GridPane.setMargin(submitButton, new Insets(20, 0,20,0));
 
+        String connectionUrl = "jdbc:mysql://localhost:3306/new_schema?user=root&password=fireflea431!";
+
         submitButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 if(nameField.getText().isEmpty()) {
                     showAlert(Alert.AlertType.ERROR, gridPane.getScene().getWindow(), "Form Error!", "Please enter your name");
                     return;
+                }
+                else{
+                    try (Connection con = DriverManager.getConnection(connectionUrl); Statement stmt = con.createStatement();) {
+                        String username = nameField.getText();
+                        System.out.println(username);
+                        String SQL = "INSERT INTO `new_schema`.`test` (`LastName`) VALUES ('" + username + "');";
+                        System.out.println(SQL);
+                        stmt.executeUpdate(SQL);
+
+                    }
+                    // Handle any errors that may have occurred.
+                    catch (SQLException e) {
+                        e.printStackTrace();
+                    }
                 }
                 if(passwordField.getText().isEmpty()) {
                     showAlert(Alert.AlertType.ERROR, gridPane.getScene().getWindow(), "Form Error!", "Please enter a master password");
@@ -169,25 +185,10 @@ public class Main extends Application {
 
     public static void main(String[] args) {
 
-        System.out.println("TEST");
+       // System.out.println("TEST");
         // Create a variable for the connection string.
        // Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-        String connectionUrl = "jdbc:mysql://localhost:3306/new_schema?user=root&password=fireflea431!";
 
-        try (Connection con = DriverManager.getConnection(connectionUrl); Statement stmt = con.createStatement();) {
-            System.out.println("TEST");
-            String SQL = "SELECT * FROM testtab1";
-            ResultSet rs = stmt.executeQuery(SQL);
-
-            // Iterate through the data in the result set and display it.
-            while (rs.next()) {
-                System.out.println(rs.getString("FirstName") + " " + rs.getString("LastName"));
-            }
-        }
-        // Handle any errors that may have occurred.
-        catch (SQLException e) {
-            e.printStackTrace();
-        }
         launch(args);
     }
 }
