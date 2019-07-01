@@ -24,35 +24,45 @@ import java.io.File;
 import javafx.scene.image.Image;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.lang.*;
 
 public class Main extends Application {
 
+    Scene scene1, scene2;
+    Stage window;
+
     @Override
     public void start(Stage primaryStage) throws Exception {
+        window = primaryStage;
+
         primaryStage.setTitle("Personal Password Manager");
         primaryStage.initStyle(StageStyle.DECORATED);
         Image i = new Image(getClass().getResourceAsStream("images/lock.png"));
         primaryStage.getIcons().add(i);
-       // primaryStage.getIcons().clear();
-        //primaryStage.getIcons().add("file:///" + i.getAbsolutePath().replace("\\", "/"));
+
         // Create the registration form grid pane
         GridPane gridPane = createRegistrationFormPane();
         // Add UI controls to the registration form grid pane
         addUIControls(gridPane);
         // Create a scene with registration form grid pane as the root node
-        Scene scene = new Scene(gridPane, 800, 500);
+        scene1 = new Scene(gridPane, 800, 500);
         // Gets css file used for so styling
         File f = new File("src\\sample\\stylesheet.css");
-        scene.getStylesheets().clear();
-        scene.getStylesheets().add("file:///" + f.getAbsolutePath().replace("\\", "/"));
-        //scene.getStylesheets().add(System.getProperty("user.dir") + "\\src\\sample\\stylesheet.css");
-       // scene.getStylesheets().add(getClass().getResource(System.getProperty("user.dir") + "\\src\\sample\\*.css").toExternalForm());
+        scene1.getStylesheets().clear();
+        scene1.getStylesheets().add("file:///" + f.getAbsolutePath().replace("\\", "/"));
+
+        //Scene 2
+        Label label2= new Label("This is the second scene");
+        Button button2= new Button("Go to scene 1");
+        button2.setOnAction(e -> primaryStage.setScene(scene1));
+        VBox layout2= new VBox(20);
+        layout2.getChildren().addAll(label2, button2);
+        scene2= new Scene(layout2,300,250);
+
         // Set the scene in primary stage
-        primaryStage.setScene(scene);
+        primaryStage.setScene(scene1);
 
         primaryStage.show();
     }
@@ -125,12 +135,7 @@ public class Main extends Application {
         gridPane.add(profileButton, 0, 5, 2, 1);
         GridPane.setHalignment(profileButton, HPos.CENTER);
         GridPane.setMargin(profileButton, new Insets(6, 0,20,0));
-        profileButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-
-            }
-        });
+        profileButton.setOnAction(e -> window.setScene(scene2));
 
         // Add Submit Button
         Button submitButton = new Button("Login");
@@ -185,9 +190,9 @@ public class Main extends Application {
 
     public static void main(String[] args) {
 
-       // System.out.println("TEST");
+        // System.out.println("TEST");
         // Create a variable for the connection string.
-       // Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        // Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 
         launch(args);
     }
