@@ -40,31 +40,38 @@ public class Main extends Application {
         Image i = new Image(getClass().getResourceAsStream("images/lock.png"));
 
         // Create the registration form grid pane
-        GridPane gridPane = createRegistrationFormPane();
+        GridPane gridPane = generateForm();
         // Add UI controls to the registration form grid pane
-        addUIControls(gridPane);
+        addHomeControls(gridPane);
         // Create a scene with registration form grid pane as the root node
 
-        Button button1= new Button("Go to scene 2");
+        Button button1= new Button("Create a profile");
+        button1.setPrefHeight(40);
+        button1.setDefaultButton(true);
+        button1.setPrefWidth(160);
         button1.setOnAction(e -> primaryStage.setScene(scene2));
 
-        VBox layout1= new VBox(20);
+        VBox layout1= new VBox();
         layout1.getChildren().addAll(gridPane, button1);
+        layout1.setAlignment(Pos.CENTER);
         scene1 = new Scene(layout1, 800, 500);
         // Gets css file used for so styling
 
         scene1.getStylesheets().clear();
         scene1.getStylesheets().add("file:///" + f.getAbsolutePath().replace("\\", "/"));
 
-        GridPane gridPane2 = createRegistrationFormPane();
+        GridPane gridPane2 = generateForm();
         // Add UI controls to the registration form grid pane
         addUIControls(gridPane2);
 
         //Scene 2
-        Label label2= new Label("This is the second scene");
-        Button button2= new Button("Go to scene 1");
+        Button button2= new Button("Home");
+        button2.setPrefHeight(40);
+        button2.setDefaultButton(true);
+        button2.setPrefWidth(100);
         button2.setOnAction(e -> primaryStage.setScene(scene1));
-        VBox layout2= new VBox(20);
+        VBox layout2= new VBox();
+        layout2.setAlignment(Pos.CENTER);
         layout2.getChildren().addAll(gridPane2, button2);
         scene2= new Scene(layout2,800,510);
 
@@ -80,7 +87,7 @@ public class Main extends Application {
     }
 
 
-    private GridPane createRegistrationFormPane() {
+    private GridPane generateForm() {
         // Instantiate a new Grid Pane
         GridPane gridPane = new GridPane();
 
@@ -111,7 +118,7 @@ public class Main extends Application {
         return gridPane;
     }
 
-    private void addUIControls(GridPane gridPane) {
+    private void addHomeControls(GridPane gridPane) {
         // Add Header
         Label headerLabel = new Label("Protect your passwords, people!");
         headerLabel.setFont(Font.font("Arial", FontWeight.BOLD, 24));
@@ -140,23 +147,60 @@ public class Main extends Application {
 
 
         // Add Submit Button
-        Button profileButton = new Button("New Profile");
-        profileButton.setPrefHeight(40);
-        profileButton.setDefaultButton(true);
-        profileButton.setPrefWidth(120);
-        gridPane.add(profileButton, 0, 5, 2, 1);
-        GridPane.setHalignment(profileButton, HPos.CENTER);
-        GridPane.setMargin(profileButton, new Insets(6, 0,20,0));
-        profileButton.setOnAction(e -> window.setScene(scene2));
+        Button loginButton = new Button("Login");
+        loginButton.setPrefHeight(40);
+        loginButton.setDefaultButton(true);
+        loginButton.setPrefWidth(100);
+        gridPane.add(loginButton, 0, 4, 2, 1);
+        GridPane.setHalignment(loginButton, HPos.CENTER);
+        GridPane.setMargin(loginButton, new Insets(20, 0,0,0));
+
+    }
+
+    private void addUIControls(GridPane gridPane) {
+        // Add Header
+        Label headerLabel = new Label("Registration Form");
+        headerLabel.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+        gridPane.add(headerLabel, 0,0,2,1);
+        GridPane.setHalignment(headerLabel, HPos.CENTER);
+        GridPane.setMargin(headerLabel, new Insets(20, 0,20,0));
+
+        // Add Name Label
+        Label nameLabel = new Label("Enter a Username : ");
+        gridPane.add(nameLabel, 0,1);
+
+        // Add Name Text Field
+        TextField nameField = new TextField();
+        nameField.setPrefHeight(40);
+        gridPane.add(nameField, 1,1);
+
+
+        // Add Password Label
+        Label passwordLabel = new Label("Password : ");
+        gridPane.add(passwordLabel, 0, 2);
+
+        // Add Password Field
+        PasswordField passwordField = new PasswordField();
+        passwordField.setPrefHeight(40);
+        gridPane.add(passwordField, 1, 2);
+
+        // Add Re-enter Password Label
+        Label passwordLabel2 = new Label("Re-enter Password : ");
+        gridPane.add(passwordLabel2, 0, 3);
+
+        // Add Password Field
+        PasswordField passwordField2 = new PasswordField();
+        passwordField2.setPrefHeight(40);
+        gridPane.add(passwordField2, 1, 3);
 
         // Add Submit Button
-        Button submitButton = new Button("Login");
+        Button submitButton = new Button("Submit");
         submitButton.setPrefHeight(40);
         submitButton.setDefaultButton(true);
         submitButton.setPrefWidth(100);
-        gridPane.add(submitButton, 0, 4, 2, 1);
+        gridPane.add(submitButton, 0, 5, 2, 1);
         GridPane.setHalignment(submitButton, HPos.CENTER);
-        GridPane.setMargin(submitButton, new Insets(20, 0,20,0));
+        GridPane.setMargin(submitButton, new Insets(20, 0,0,0));
 
         String connectionUrl = "jdbc:mysql://localhost:3306/new_schema?user=root&password=fireflea431!";
 
