@@ -3,6 +3,7 @@
     https://www.youtube.com/watch?v=FLkOX4Eez6o
     https://www.callicoder.com/javafx-registration-form-gui-tutorial/
     https://blog.idrsolutions.com/2014/04/use-external-css-files-javafx/
+    https://www.javainterviewpoint.com/java-salted-password-hashing/
 */
 package sample;
 import javafx.application.Application;
@@ -31,6 +32,7 @@ import java.security.SecureRandom;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.nio.charset.StandardCharsets;
+import java.sql.PreparedStatement;
 
 public class Main extends Application {
 
@@ -212,36 +214,64 @@ public class Main extends Application {
         submitButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                if(nameField.getText().isEmpty()) {
+                if(nameField.getText().isEmpty())
+                {
                     showAlert(Alert.AlertType.ERROR, gridPane.getScene().getWindow(), "Form Error!", "Please enter your name");
                     return;
                 }
-
-                if(passwordField.getText().isEmpty()) {
+                if(passwordField.getText().isEmpty())
+                {
                     showAlert(Alert.AlertType.ERROR, gridPane.getScene().getWindow(), "Form Error!", "Please enter a master password");
                     return;
                 }
+                if(passwordField2.getText().isEmpty())
+                {
+                    showAlert(Alert.AlertType.ERROR, gridPane.getScene().getWindow(), "Form Error!", "Please re-enter password");
+                    return;
+                }
+                if(!passwordField.getText().equals(passwordField2.getText()))
+                {
+                    showAlert(Alert.AlertType.ERROR, gridPane.getScene().getWindow(), "Form Error!", "Passwords don't match");
+                    return;
+                }
+                if(passwordField.getText().length() < 6)
+                {
+                    showAlert(Alert.AlertType.ERROR, gridPane.getScene().getWindow(), "Form Error!", "Passwords should be at least 6 characters");
+                    return;
+                }
                 else {
-                    try (Connection con = DriverManager.getConnection(connectionUrl); Statement stmt = con.createStatement();) {
+                    try (Connection con = DriverManager.getConnection(connectionUrl)) {
 
-                        String password = nameField.getText();
+                        String password = passwordField.getText();
                         String username = nameField.getText();
 
                         SecureRandom random = new SecureRandom();
                         byte[] salt = new byte[16];
                         random.nextBytes(salt);
-                        String saltedPW = password + salt;
 
                         try {
                             MessageDigest md = MessageDigest.getInstance("SHA-256");
 
-                            byte[] hashedSaltedPW = md.digest(saltedPW.getBytes());
+                          //  System.out.println(md.digest(password.getBytes(StandardCharsets.UTF_8)));
+                            byte[] hashedSaltedPW = md.digest(password.getBytes(StandardCharsets.UTF_8));
 
-                            md.update(hashedSaltedPW);
-                            System.out.println(hashedSaltedPW);
-                            String SQL = "INSERT INTO `mydb`.`accounts` (`id`, `username`, `salt`, `hashedSaltedPW`) VALUES (NULL,'" + username + "', '" + salt + "', '" + hashedSaltedPW + "');";
-                            System.out.println(SQL);
-                            stmt.executeUpdate(SQL);
+                         //   System.out.println(password);
+                          //  System.out.println(salt);
+                            //System.out.println(saltedPW);
+                         //   System.out.println(hashedSaltedPW);
+                            PreparedStatement stmt = con.prepareStatement("INSERT INTO `mydb`.`accounts` (id, username, salt, hashedSaltedPW) VALUES (NULL, ?, ?, ?)");
+                            //String query = "INSERT INTO `mydb`.`accounts` (`id`, `username`, `salt`, `hashedSaltedPW`) VALUES (NULL,'" + username + "', '" + salt + "', '" + hashedSaltedPW + "');";
+                         //   System.out.println(SQL);
+                            //query.setInt(1, id);
+                            stmt.setString(1, username);
+                            stmt.setBytes(2, salt);
+                            stmt.setBytes(3, hashedSaltedPW);
+                            stmt.executeUpdate();
+
+                          //  StringBuilder sb = new StringBuilder();
+                         //   for (byte b : hashedSaltedPW)
+                         //       sb.append(String.format("%02x", b));
+                         //   System.out.println(sb);
 
 
                         } catch (NoSuchAlgorithmException e) {
