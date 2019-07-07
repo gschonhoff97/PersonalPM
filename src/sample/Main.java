@@ -216,49 +216,45 @@ public class Main extends Application {
                     showAlert(Alert.AlertType.ERROR, gridPane.getScene().getWindow(), "Form Error!", "Please enter your name");
                     return;
                 }
-                else{
+
+                if(passwordField.getText().isEmpty()) {
+                    showAlert(Alert.AlertType.ERROR, gridPane.getScene().getWindow(), "Form Error!", "Please enter a master password");
+                    return;
+                }
+                else {
                     try (Connection con = DriverManager.getConnection(connectionUrl); Statement stmt = con.createStatement();) {
 
+                        String password = nameField.getText();
                         String username = nameField.getText();
-
 
                         SecureRandom random = new SecureRandom();
                         byte[] salt = new byte[16];
                         random.nextBytes(salt);
-                        System.out.println(salt+username);
-                        String usernamee = salt + username;
+                        String saltedPW = password + salt;
 
                         try {
                             MessageDigest md = MessageDigest.getInstance("SHA-256");
 
-                            byte[] hashedPassword = md.digest(usernamee.getBytes());
+                            byte[] hashedSaltedPW = md.digest(saltedPW.getBytes());
 
-                            md.update(hashedPassword);
-                            System.out.println(hashedPassword);
+                            md.update(hashedSaltedPW);
+                            System.out.println(hashedSaltedPW);
+                            String SQL = "INSERT INTO `mydb`.`accounts` (`id`, `username`, `salt`, `hashedSaltedPW`) VALUES (NULL,'" + username + "', '" + salt + "', '" + hashedSaltedPW + "');";
+                            System.out.println(SQL);
+                            stmt.executeUpdate(SQL);
+
 
                         } catch (NoSuchAlgorithmException e) {
                             throw new UnsupportedOperationException(e);
                         }
-
-
-
-
-                        String SQL = "INSERT INTO `mydb`.`accounts` (`username`) VALUES ('" + username + "');";
-                        System.out.println(SQL);
-                        stmt.executeUpdate(SQL);
 
                     }
                     // Handle any errors that may have occurred.
                     catch (SQLException e) {
                         e.printStackTrace();
                     }
+                    showAlert(Alert.AlertType.CONFIRMATION, gridPane.getScene().getWindow(), "Registration Successful!", "Welcome " + nameField.getText());
                 }
-                if(passwordField.getText().isEmpty()) {
-                    showAlert(Alert.AlertType.ERROR, gridPane.getScene().getWindow(), "Form Error!", "Please enter a master password");
-                    return;
-                }
-
-                showAlert(Alert.AlertType.CONFIRMATION, gridPane.getScene().getWindow(), "Registration Successful!", "Welcome " + nameField.getText());
             }
         });
     }
