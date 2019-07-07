@@ -4,6 +4,7 @@
     https://www.callicoder.com/javafx-registration-form-gui-tutorial/
     https://blog.idrsolutions.com/2014/04/use-external-css-files-javafx/
     https://www.javainterviewpoint.com/java-salted-password-hashing/
+    https://coderanch.com/t/299896/databases/insert-password-encrypted-form-table
 */
 package sample;
 import javafx.application.Application;
@@ -26,7 +27,6 @@ import javafx.scene.image.Image;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.lang.*;
 import java.security.SecureRandom;
 import java.security.MessageDigest;
@@ -250,29 +250,16 @@ public class Main extends Application {
                         random.nextBytes(salt);
 
                         try {
-                            MessageDigest md = MessageDigest.getInstance("SHA-256");
 
-                          //  System.out.println(md.digest(password.getBytes(StandardCharsets.UTF_8)));
+                            MessageDigest md = MessageDigest.getInstance("SHA-256");
                             byte[] hashedSaltedPW = md.digest(password.getBytes(StandardCharsets.UTF_8));
 
-                         //   System.out.println(password);
-                          //  System.out.println(salt);
-                            //System.out.println(saltedPW);
-                         //   System.out.println(hashedSaltedPW);
                             PreparedStatement stmt = con.prepareStatement("INSERT INTO `mydb`.`accounts` (id, username, salt, hashedSaltedPW) VALUES (NULL, ?, ?, ?)");
-                            //String query = "INSERT INTO `mydb`.`accounts` (`id`, `username`, `salt`, `hashedSaltedPW`) VALUES (NULL,'" + username + "', '" + salt + "', '" + hashedSaltedPW + "');";
-                         //   System.out.println(SQL);
-                            //query.setInt(1, id);
+
                             stmt.setString(1, username);
-                            stmt.setBytes(2, salt);
-                            stmt.setBytes(3, hashedSaltedPW);
+                            stmt.setString(2, asHex(salt));
+                            stmt.setString(3, asHex(hashedSaltedPW));
                             stmt.executeUpdate();
-
-                          //  StringBuilder sb = new StringBuilder();
-                         //   for (byte b : hashedSaltedPW)
-                         //       sb.append(String.format("%02x", b));
-                         //   System.out.println(sb);
-
 
                         } catch (NoSuchAlgorithmException e) {
                             throw new UnsupportedOperationException(e);
@@ -287,6 +274,17 @@ public class Main extends Application {
                 }
             }
         });
+    }
+
+    private static String asHex (byte hash[]) {
+        StringBuffer buf = new StringBuffer(hash.length * 2);
+        int i;
+        for (i = 0; i < hash.length; i++) {
+            if (((int) hash[i] & 0xff) < 0x10)
+                buf.append("0");
+            buf.append(Long.toString((int) hash[i] & 0xff, 16));
+        }
+        return buf.toString();
     }
 
     private void showAlert(Alert.AlertType alertType, Window owner, String title, String message) {
