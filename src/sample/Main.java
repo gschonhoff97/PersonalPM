@@ -27,6 +27,10 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.lang.*;
+import java.security.SecureRandom;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.nio.charset.StandardCharsets;
 
 public class Main extends Application {
 
@@ -202,6 +206,7 @@ public class Main extends Application {
         GridPane.setHalignment(submitButton, HPos.CENTER);
         GridPane.setMargin(submitButton, new Insets(20, 0,0,0));
 
+
         String connectionUrl = "jdbc:mysql://localhost:3306/new_schema?user=root&password=fireflea431!";
 
         submitButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -213,9 +218,32 @@ public class Main extends Application {
                 }
                 else{
                     try (Connection con = DriverManager.getConnection(connectionUrl); Statement stmt = con.createStatement();) {
+
                         String username = nameField.getText();
-                        System.out.println(username);
-                        String SQL = "INSERT INTO `new_schema`.`test` (`LastName`) VALUES ('" + username + "');";
+
+
+                        SecureRandom random = new SecureRandom();
+                        byte[] salt = new byte[16];
+                        random.nextBytes(salt);
+                        System.out.println(salt+username);
+                        String usernamee = salt + username;
+
+                        try {
+                            MessageDigest md = MessageDigest.getInstance("SHA-256");
+
+                            byte[] hashedPassword = md.digest(usernamee.getBytes());
+
+                            md.update(hashedPassword);
+                            System.out.println(hashedPassword);
+
+                        } catch (NoSuchAlgorithmException e) {
+                            throw new UnsupportedOperationException(e);
+                        }
+
+
+
+
+                        String SQL = "INSERT INTO `mydb`.`accounts` (`username`) VALUES ('" + username + "');";
                         System.out.println(SQL);
                         stmt.executeUpdate(SQL);
 
