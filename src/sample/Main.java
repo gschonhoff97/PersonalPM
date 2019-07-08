@@ -33,7 +33,7 @@ import java.nio.charset.StandardCharsets;
 
 public class Main extends Application {
 
-    Scene scene1, scene2;
+    Scene scene1, scene2, scene3;
     Stage window;
 
     @Override
@@ -80,6 +80,19 @@ public class Main extends Application {
 
         scene2.getStylesheets().clear();
         scene2.getStylesheets().add("file:///" + f.getAbsolutePath().replace("\\", "/"));
+
+
+        ListView listView1 = passwordList();
+        // Add UI controls to the registration form grid pane
+        VBox layout3= new VBox();
+        layout3.setAlignment(Pos.CENTER);
+        layout3.getChildren().addAll(listView1);
+        scene3= new Scene(layout3,800,510);
+        scene3.getStylesheets().clear();
+        scene3.getStylesheets().add("file:///" + f.getAbsolutePath().replace("\\", "/"));
+
+
+
 
         // Set the scene in primary stage
         window.setScene(scene1);
@@ -200,6 +213,7 @@ public class Main extends Application {
                             if (asHex(hashedSaltedPW).equals(extractedHashSaltedPW.toString()))
                             {
                                 System.out.println("True!");
+                                window.setScene(scene3);
                             }
 
                         } catch (NoSuchAlgorithmException e) {
@@ -210,7 +224,7 @@ public class Main extends Application {
                     catch (SQLException e) {
                         e.printStackTrace();
                     }
-                    showAlert(Alert.AlertType.CONFIRMATION, gridPane.getScene().getWindow(), "Registration Successful!", "Welcome " + nameField.getText());
+                    //showAlert(Alert.AlertType.CONFIRMATION, gridPane.getScene().getWindow(), "Registration Successful!", "Welcome " + nameField.getText());
                 }
             }
         });
@@ -306,10 +320,7 @@ public class Main extends Application {
                             random.nextBytes(salt);
                             MessageDigest md = MessageDigest.getInstance("SHA-256");
 
-                            System.out.println("PW: " + password);
-                            System.out.println("SALT" + asHex(salt));
                             password += asHex(salt);
-                            //password = asHex(password);
 
                             byte[] hashedSaltedPW = md.digest(password.getBytes(StandardCharsets.UTF_8));
 
@@ -335,6 +346,19 @@ public class Main extends Application {
         });
     }
 
+    private ListView passwordList(){
+        window.setTitle("List View Sample");
+
+        final ListView listView = new ListView();
+        listView.setPrefSize(200, 250);
+        listView.setEditable(true);
+
+        StackPane root = new StackPane();
+        root.getChildren().add(listView);
+        return listView;
+    }
+
+
     private static String asHex (byte hash[]) {
         StringBuffer buf = new StringBuffer(hash.length * 2);
         int i;
@@ -356,10 +380,6 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
-
-        // System.out.println("TEST");
-        // Create a variable for the connection string.
-        // Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 
         launch(args);
     }
