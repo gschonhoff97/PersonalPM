@@ -24,15 +24,12 @@ import javafx.stage.Window;
 import java.lang.String;
 import java.io.File;
 import javafx.scene.image.Image;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 import java.lang.*;
 import java.security.SecureRandom;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.nio.charset.StandardCharsets;
-import java.sql.PreparedStatement;
 
 public class Main extends Application {
 
@@ -159,7 +156,64 @@ public class Main extends Application {
         loginButton.setPrefWidth(100);
         gridPane.add(loginButton, 0, 4, 2, 1);
         GridPane.setHalignment(loginButton, HPos.CENTER);
-        GridPane.setMargin(loginButton, new Insets(20, 0,0,0));
+        GridPane.setMargin(loginButton, new Insets(18, 0,0,0));
+
+        String connectionUrl = "jdbc:mysql://localhost:3306/new_schema?user=root&password=fireflea431!";
+
+        loginButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                if(nameField.getText().isEmpty())
+                {
+                    showAlert(Alert.AlertType.ERROR, gridPane.getScene().getWindow(), "Form Error!", "Please enter your name");
+                    return;
+                }
+                if(passwordField.getText().isEmpty())
+                {
+                    showAlert(Alert.AlertType.ERROR, gridPane.getScene().getWindow(), "Form Error!", "Please enter a master password");
+                    return;
+                }
+                else {
+                    try (Connection con = DriverManager.getConnection(connectionUrl)) {
+
+                        String password = passwordField.getText();
+                        String username = nameField.getText();
+
+                        PreparedStatement stmt = con.prepareStatement("SELECT salt, hashedSaltedPW FROM `mydb`.`accounts` WHERE username=?");
+
+                        stmt.setString(1, username);
+                        ResultSet rs = stmt.executeQuery();
+
+                        StringBuilder extractedSalt = new StringBuilder();
+                        StringBuilder extractedHashSaltedPW = new StringBuilder();
+                        while (rs.next()) {
+                            extractedSalt.append(rs.getString(1));
+                            extractedHashSaltedPW.append(rs.getString(2));
+                        }
+
+                        try {
+
+                            MessageDigest md = MessageDigest.getInstance("SHA-256");
+                            byte[] hashedSaltedPW = md.digest((password+extractedSalt).getBytes(StandardCharsets.UTF_8));
+
+
+                            if (asHex(hashedSaltedPW).equals(extractedHashSaltedPW.toString()))
+                            {
+                                System.out.println("True!");
+                            }
+
+                        } catch (NoSuchAlgorithmException e) {
+                            throw new UnsupportedOperationException(e);
+                        }
+                    }
+                    // Handle any errors that may have occurred.
+                    catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    showAlert(Alert.AlertType.CONFIRMATION, gridPane.getScene().getWindow(), "Registration Successful!", "Welcome " + nameField.getText());
+                }
+            }
+        });
 
     }
 
@@ -194,7 +248,7 @@ public class Main extends Application {
         Label passwordLabel2 = new Label("Re-enter Password : ");
         gridPane.add(passwordLabel2, 0, 3);
 
-        // Add Password Field
+        // Add Re-enter Password Field
         PasswordField passwordField2 = new PasswordField();
         passwordField2.setPrefHeight(40);
         gridPane.add(passwordField2, 1, 3);
@@ -245,13 +299,18 @@ public class Main extends Application {
                         String password = passwordField.getText();
                         String username = nameField.getText();
 
-                        SecureRandom random = new SecureRandom();
-                        byte[] salt = new byte[16];
-                        random.nextBytes(salt);
-
                         try {
 
+                            SecureRandom random = new SecureRandom();
+                            byte[] salt = new byte[16];
+                            random.nextBytes(salt);
                             MessageDigest md = MessageDigest.getInstance("SHA-256");
+
+                            System.out.println("PW: " + password);
+                            System.out.println("SALT" + asHex(salt));
+                            password += asHex(salt);
+                            //password = asHex(password);
+
                             byte[] hashedSaltedPW = md.digest(password.getBytes(StandardCharsets.UTF_8));
 
                             PreparedStatement stmt = con.prepareStatement("INSERT INTO `mydb`.`accounts` (id, username, salt, hashedSaltedPW) VALUES (NULL, ?, ?, ?)");
